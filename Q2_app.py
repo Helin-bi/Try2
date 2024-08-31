@@ -69,10 +69,11 @@ if "questions" not in st.session_state:
     st.session_state.score = 0
     st.session_state.quiz_completed = False
 
-# Function to handle answer click
-def handle_click(option):
+# Function to handle answer selection
+def handle_answer(option):
     current_question = list(st.session_state.questions.keys())[st.session_state.current_question_index]
     correct_answer = st.session_state.questions[current_question]["answer"]
+
     if option == correct_answer:
         st.session_state.score += 1
 
@@ -80,9 +81,6 @@ def handle_click(option):
 
     if st.session_state.current_question_index >= len(st.session_state.questions):
         st.session_state.quiz_completed = True
-
-    # Rerun the script to update the UI
-    st.experimental_rerun()
 
 # Display the current question
 if not st.session_state.quiz_completed:
@@ -95,7 +93,9 @@ if not st.session_state.quiz_completed:
 
         # Display clickable options for answers
         for option in options:
-            st.button(option, key=f"btn_{st.session_state.current_question_index}_{option}", on_click=lambda o=option: handle_click(o))
+            if st.button(option, key=f"btn_{st.session_state.current_question_index}_{option}"):
+                handle_answer(option)
+                st.experimental_rerun()  # Rerun after handling the answer to refresh the question
 
 # Display the score page
 if st.session_state.quiz_completed:
