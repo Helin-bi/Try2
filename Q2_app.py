@@ -82,17 +82,15 @@ if not st.session_state.quiz_completed:
                 correct_answer = st.session_state.questions[current_question]["answer"]
                 if option == correct_answer:
                     st.session_state.score += 1
-                    st.success("Correct!")
-                else:
-                    st.error(f"Incorrect. The correct answer is {correct_answer}.")
                 
-                # Update the question index
+                # Move to the next question
                 st.session_state.current_question_index += 1
                 
+                # Check if quiz is completed
                 if st.session_state.current_question_index >= len(st.session_state.questions):
                     st.session_state.quiz_completed = True
                 
-                break  # End the current loop and update the app state
+                st.experimental_rerun()
 
 # Display the score page
 if st.session_state.quiz_completed:
@@ -117,3 +115,4 @@ if st.session_state.quiz_completed:
         st.session_state.current_question_index = 0
         st.session_state.score = 0
         st.session_state.quiz_completed = False
+        st.experimental_rerun()
