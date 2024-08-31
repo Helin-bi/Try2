@@ -92,10 +92,10 @@ if not st.session_state.quiz_completed:
         options = st.session_state.questions[current_question]["options"]
 
         # Display clickable options for answers
-        for option in options:
-            if st.button(option, key=f"btn_{st.session_state.current_question_index}_{option}"):
-                handle_answer(option)
-                st.experimental_rerun()  # Rerun after handling the answer to refresh the question
+        selected_option = st.radio("Choose your answer:", options)
+
+        if st.button("Submit Answer"):
+            handle_answer(selected_option)
 
 # Display the score page
 if st.session_state.quiz_completed:
