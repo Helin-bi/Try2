@@ -90,7 +90,11 @@ if not st.session_state.quiz_completed:
                 if st.session_state.current_question_index >= len(st.session_state.questions):
                     st.session_state.quiz_completed = True
                 
-                st.experimental_rerun()
+                # Trigger the next step without st.experimental_rerun()
+                st.experimental_set_query_params(step=st.session_state.current_question_index)
+
+                # Stop further execution after an option is selected
+                st.stop()
 
 # Display the score page
 if st.session_state.quiz_completed:
@@ -115,4 +119,5 @@ if st.session_state.quiz_completed:
         st.session_state.current_question_index = 0
         st.session_state.score = 0
         st.session_state.quiz_completed = False
+        st.experimental_set_query_params(step=0)
         st.experimental_rerun()
