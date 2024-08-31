@@ -16,6 +16,8 @@ st.markdown(
         border-radius: 5px;
         padding: 10px 20px;
         font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
     }
     .stButton>button:hover {
         background-color: #0056b3;
@@ -66,6 +68,21 @@ if "questions" not in st.session_state:
     st.session_state.current_question_index = 0
     st.session_state.score = 0
     st.session_state.quiz_completed = False
+    st.session_state.selected_option = None
+
+# Function to handle question submission
+def submit_answer():
+    correct_answer = st.session_state.questions[current_question]["answer"]
+    if st.session_state.selected_option == correct_answer:
+        st.session_state.score += 1
+
+    st.session_state.current_question_index += 1
+
+    if st.session_state.current_question_index >= len(st.session_state.questions):
+        st.session_state.quiz_completed = True
+
+    st.experimental_set_query_params(step=st.session_state.current_question_index)
+    st.session_state.selected_option = None
 
 # Display the current question
 if not st.session_state.quiz_completed:
@@ -76,25 +93,16 @@ if not st.session_state.quiz_completed:
 
         options = st.session_state.questions[current_question]["options"]
 
-        # Display button options for answers
-        for option in options:
-            if st.button(option, key=f"btn_{st.session_state.current_question_index}_{option}"):
-                correct_answer = st.session_state.questions[current_question]["answer"]
-                if option == correct_answer:
-                    st.session_state.score += 1
-                
-                # Move to the next question
-                st.session_state.current_question_index += 1
-                
-                # Check if quiz is completed
-                if st.session_state.current_question_index >= len(st.session_state.questions):
-                    st.session_state.quiz_completed = True
-                
-                # Trigger the next step without st.experimental_rerun()
-                st.experimental_set_query_params(step=st.session_state.current_question_index)
+        # Display radio button options for answers
+        st.session_state.selected_option = st.radio(
+            "Choose your answer:",
+            options,
+            key=f"radio_{st.session_state.current_question_index}"
+        )
 
-                # Stop further execution after an option is selected
-                st.stop()
+        # Proceed button to move to the next question
+        if st.button("Submit Answer", on_click=submit_answer):
+            pass
 
 # Display the score page
 if st.session_state.quiz_completed:
