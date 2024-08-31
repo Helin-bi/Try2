@@ -65,8 +65,6 @@ if "questions" not in st.session_state:
     st.session_state.questions = get_random_questions(quiz_data)
     st.session_state.current_question_index = 0
     st.session_state.score = 0
-    st.session_state.user_answers = []
-    st.session_state.show_score = False
     st.session_state.quiz_completed = False
 
 # Display the current question
@@ -118,7 +116,4 @@ if st.session_state.quiz_completed:
         st.session_state.questions = get_random_questions(quiz_data)
         st.session_state.current_question_index = 0
         st.session_state.score = 0
-        st.session_state.show_score = False
-        st.session_state.user_answers = []
         st.session_state.quiz_completed = False
-        st.experimental_rerun()
