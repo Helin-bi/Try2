@@ -68,12 +68,12 @@ if "questions" not in st.session_state:
     st.session_state.current_question_index = 0
     st.session_state.score = 0
     st.session_state.quiz_completed = False
-    st.session_state.selected_option = None
 
-# Function to handle question submission
-def submit_answer():
+# Function to handle answer click
+def handle_click(option):
+    current_question = list(st.session_state.questions.keys())[st.session_state.current_question_index]
     correct_answer = st.session_state.questions[current_question]["answer"]
-    if st.session_state.selected_option == correct_answer:
+    if option == correct_answer:
         st.session_state.score += 1
 
     st.session_state.current_question_index += 1
@@ -81,8 +81,8 @@ def submit_answer():
     if st.session_state.current_question_index >= len(st.session_state.questions):
         st.session_state.quiz_completed = True
 
-    st.experimental_set_query_params(step=st.session_state.current_question_index)
-    st.session_state.selected_option = None
+    # Rerun the script to update the UI
+    st.experimental_rerun()
 
 # Display the current question
 if not st.session_state.quiz_completed:
@@ -93,16 +93,9 @@ if not st.session_state.quiz_completed:
 
         options = st.session_state.questions[current_question]["options"]
 
-        # Display radio button options for answers
-        st.session_state.selected_option = st.radio(
-            "Choose your answer:",
-            options,
-            key=f"radio_{st.session_state.current_question_index}"
-        )
-
-        # Proceed button to move to the next question
-        if st.button("Submit Answer", on_click=submit_answer):
-            pass
+        # Display clickable options for answers
+        for option in options:
+            st.button(option, key=f"btn_{st.session_state.current_question_index}_{option}", on_click=lambda o=option: handle_click(o))
 
 # Display the score page
 if st.session_state.quiz_completed:
@@ -120,12 +113,3 @@ if st.session_state.quiz_completed:
     st.write("Share your score:")
     st.markdown(f"[Share on WhatsApp](https://api.whatsapp.com/send?text={share_text})", unsafe_allow_html=True)
     st.markdown(f"[Share on Twitter](https://twitter.com/intent/tweet?text={share_text})", unsafe_allow_html=True)
-
-    # Reset the quiz
-    if st.button("Retake the Quiz"):
-        st.session_state.questions = get_random_questions(quiz_data)
-        st.session_state.current_question_index = 0
-        st.session_state.score = 0
-        st.session_state.quiz_completed = False
-        st.experimental_set_query_params(step=0)
-        st.experimental_rerun()
