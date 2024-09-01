@@ -1,59 +1,166 @@
 import streamlit as st
 import random
+from PIL import Image
+import base64
+import io
 
-# Set background color or image using custom CSS
+# Load images from local files
+company_logo = Image.open("narmada_logo.png")  # Path to your local logo image
+background_image = Image.open("green_background.jpg")  # Path to your local background image
+
+# Convert background image to base64
+buffered = io.BytesIO()
+background_image.save(buffered, format="JPEG")  # Adjust format based on your image type
+background_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+
+# Display background image using Streamlit's image with background styling
 st.markdown(
-    """
+    f"""
     <style>
-    .stApp {
-        background-image: url("https://www.yourimageurl.com/background.jpg");
+    .stApp {{
+        background: url("data:image/jpeg;base64,{background_image_base64}") no-repeat center center fixed;
         background-size: cover;
-        background-attachment: fixed;
-    }
-    .stButton>button {
-        background-color: #007bff;
+        background-color: rgba(249, 249, 244, 0.95);
+    }}
+    .welcome-box {{
+        display: none;
+    }}
+    .welcome-text {{
+        color: #2d4739;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        text-align: center;
+    }}
+    .welcome-subtext {{
+        color: #3d5a3c;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+        text-align: center;
+    }}
+    .stButton>button {{
+        background-color: #4CAF50;
         color: white;
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s ease;
+        border: none;
+    }}
+    .stButton>button:active {{
+        transform: scale(0.95);
+    }}
+    .quiz-header {{
+        font-size: 1.5em;
+        font-weight: bold;
+        text-align: center;
+        color: #4CAF50;
+        margin-top: 20px;
+    }}
+    .question-box {{
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        font-size: 1.2em;
+        color: #2d4739; /* Ensures text is visible */
+    }}
+    .option-button {{
+        display: block;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
         border-radius: 5px;
         padding: 10px 20px;
-        font-size: 16px;
+        font-size: 1em;
+        margin: 10px auto;
         cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    .stButton>button:hover {
-        background-color: #0056b3;
-    }
-    .celebration {
+        width: 80%;
+    }}
+    .score-box {{
+        background-color: rgba(255, 255, 255, 0.85);
+        border-radius: 15px;
+        padding: 30px;
+        margin: 20px 0;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        animation: slideIn 0.5s ease-out;
+        /* Removed black and white box effect */
+    }}
+    .score-text {{
+        color: #2d4739;
+        font-size: 2em;
+        font-weight: bold;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }}
+    .celebration {{
         text-align: center;
         font-size: 2em;
         color: #28a745;
-        margin-top: 50px;
-    }
+        margin-top: 20px;
+        font-weight: bold;
+    }}
+    @keyframes fadeIn {{
+        from {{ opacity: 0; }}
+        to {{ opacity: 1; }}
+    }}
+    @keyframes slideIn {{
+        from {{ transform: translateY(50px); }}
+        to {{ transform: translateY(0); }}
+    }}
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Quiz data
+# Welcome page logic
+if "welcome_page" not in st.session_state:
+    st.session_state.welcome_page = True
+
+if st.session_state.welcome_page:
+    # Display the company logo and welcome box
+    st.image(company_logo, use_column_width=True)
+
+    st.markdown(f"<div class='welcome-text'>Welcome to the Quiz!</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='welcome-subtext'>Presented by Narmada Bio Chem Limited</div>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class='welcome-subtext'>
+        Test your knowledge about organic farming, bio-fertilizers, and sustainable agriculture. 
+        Learn about the importance of organic fertilizers for a greener tomorrow!
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    if st.button("Start Quiz"):
+        st.session_state.welcome_page = False
+        st.experimental_rerun()
+
+# Quiz Data
 quiz_data = {
-    "What is the capital of India?": {
-        "options": ["Delhi", "Mumbai", "Chennai", "Kolkata"],
-        "answer": "Delhi"
+    "Which component is a key ingredient in organic fertilizers?": {
+        "options": ["Compost", "Plastic", "Chemical", "Metal"],
+        "answer": "Compost"
     },
-    "Which nutrient is essential for plant growth?": {
-        "options": ["Nitrogen", "Oxygen", "Carbon Dioxide", "Hydrogen"],
+    "What is the primary benefit of bio-fertilizers?": {
+        "options": ["Promotes chemical growth", "Increases crop yield naturally", "Harms soil", "Decreases plant growth"],
+        "answer": "Increases crop yield naturally"
+    },
+    "Which of the following is considered an eco-friendly fertilizer?": {
+        "options": ["Bio-fertilizer", "Plastic mulch", "Synthetic chemicals", "Pesticides"],
+        "answer": "Bio-fertilizer"
+    },
+    "Which farming method uses organic fertilizers?": {
+        "options": ["Organic farming", "Hydroponic farming", "Conventional farming", "Factory farming"],
+        "answer": "Organic farming"
+    },
+    "Which element is essential in bio-fertilizers for plant growth?": {
+        "options": ["Nitrogen", "Lead", "Aluminum", "Mercury"],
         "answer": "Nitrogen"
-    },
-    "What is the process of converting sunlight into energy in plants?": {
-        "options": ["Photosynthesis", "Respiration", "Transpiration", "Osmosis"],
-        "answer": "Photosynthesis"
-    },
-    "Which element is a micronutrient for plants?": {
-        "options": ["Iron", "Carbon", "Hydrogen", "Oxygen"],
-        "answer": "Iron"
-    },
-    "What is the main component of organic fertilizers?": {
-        "options": ["Carbon", "Nitrogen", "Phosphorus", "Potassium"],
-        "answer": "Carbon"
     },
 }
 
@@ -62,7 +169,7 @@ def get_random_questions(quiz_data, num_questions=3):
     questions = random.sample(list(quiz_data.keys()), num_questions)
     return {question: quiz_data[question] for question in questions}
 
-# Initialize session state
+# Initialize session state for the quiz
 if "questions" not in st.session_state:
     st.session_state.questions = get_random_questions(quiz_data)
     st.session_state.current_question_index = 0
@@ -82,34 +189,42 @@ def handle_answer(option):
     if st.session_state.current_question_index >= len(st.session_state.questions):
         st.session_state.quiz_completed = True
 
-# Display the current question
-if not st.session_state.quiz_completed:
-    if st.session_state.current_question_index < len(st.session_state.questions):
-        current_question = list(st.session_state.questions.keys())[st.session_state.current_question_index]
-        st.write(f"**Question {st.session_state.current_question_index + 1} of {len(st.session_state.questions)}:**")
-        st.write(current_question)
+# Display the quiz
+if not st.session_state.welcome_page:
+    if not st.session_state.quiz_completed:
+        if st.session_state.current_question_index < len(st.session_state.questions):
+            current_question = list(st.session_state.questions.keys())[st.session_state.current_question_index]
+            st.markdown(f"<div class='quiz-header'>Question {st.session_state.current_question_index + 1}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='question-box'>{current_question}</div>", unsafe_allow_html=True)
 
-        options = st.session_state.questions[current_question]["options"]
+            options = st.session_state.questions[current_question]["options"]
 
-        # Display clickable options for answers
-        selected_option = st.radio("Choose your answer:", options)
+            # Display clickable option boxes
+            for option in options:
+                if st.button(option, key=option):
+                    handle_answer(option)
+                    st.experimental_rerun()
 
-        if st.button("Submit Answer"):
-            handle_answer(selected_option)
+    # Show score at the end
+    if st.session_state.quiz_completed:
+        st.markdown("<div class='score-box'>", unsafe_allow_html=True)
+        
+        st.markdown(f"<div class='score-text'>Quiz Completed!</div>", unsafe_allow_html=True)
+        
+        if st.session_state.score == len(st.session_state.questions):
+            st.markdown("<div class='score-text'>🎉 Perfect Score! 🎉</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='score-text'>Your final score is **{st.session_state.score}/{len(st.session_state.questions)}**</div>", unsafe_allow_html=True)
+            st.markdown('<div class="celebration">Congratulations! You got all answers correct!</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f"<div class='score-text'>Your final score is **{st.session_state.score}/{len(st.session_state.questions)}**</div>", unsafe_allow_html=True)
+        
+        # Additional elements
+        st.markdown("**Download your personalized certificate:** [Download](#)", unsafe_allow_html=True)
 
-# Display the score page
-if st.session_state.quiz_completed:
-    st.write("## Quiz Completed!")
-    
-    if st.session_state.score == len(st.session_state.questions):
-        st.write("## 🎉 Perfect Score! 🎉")
-        st.write(f"Your final score is **{st.session_state.score}/{len(st.session_state.questions)}**")
-        st.markdown('<div class="celebration">Congratulations! You got all answers correct!</div>', unsafe_allow_html=True)
-    else:
-        st.write(f"Your final score is **{st.session_state.score}/{len(st.session_state.questions)}**")
+        # Share the score on social media
+        share_text = f"I scored {st.session_state.score}/{len(st.session_state.questions)} in the Organic Fertilizer Quiz!"
+        st.write("Share your score:")
+        st.markdown(f"[Share on WhatsApp](https://api.whatsapp.com/send?text={share_text})", unsafe_allow_html=True)
+        st.markdown(f"[Share on Twitter](https://twitter.com/intent/tweet?text={share_text})", unsafe_allow_html=True)
 
-    # Share the score on social media
-    share_text = f"I scored {st.session_state.score}/{len(st.session_state.questions)} in the Agriculture Quiz!"
-    st.write("Share your score:")
-    st.markdown(f"[Share on WhatsApp](https://api.whatsapp.com/send?text={share_text})", unsafe_allow_html=True)
-    st.markdown(f"[Share on Twitter](https://twitter.com/intent/tweet?text={share_text})", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
