@@ -5,8 +5,10 @@ import requests
 from io import BytesIO
 
 # URL to the raw images in your GitHub repository
-company_logo_url = "https://raw.githubusercontent.com/your-username/your-repo/main/path/to/narmada_logo.png"
-background_image_url = "https://raw.githubusercontent.com/your-username/your-repo/main/path/to/green_background.jpg"
+company_logo_url = "https://github.com/Helin-bi/Try2/blob/main/narmada%20logo.png?raw=true"
+background_image_url = "https://github.com/Helin-bi/Try2/blob/main/green_background.jpg?raw=true"
+
+
 
 # Load images from GitHub
 response_logo = requests.get(company_logo_url)
