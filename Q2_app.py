@@ -3,26 +3,37 @@ import random
 from PIL import Image
 import requests
 from io import BytesIO
-import base64  # Import base64 for encoding
+import base64
 
 # URL to the raw images in your GitHub repository
 company_logo_url = "https://github.com/Helin-bi/Try2/blob/main/narmada%20logo.png?raw=true"
 background_image_url = "https://github.com/Helin-bi/Try2/blob/main/green_background.jpg?raw=true"
 
 # Load images from GitHub
-response_logo = requests.get(company_logo_url)
-company_logo = Image.open(BytesIO(response_logo.content))
+try:
+    response_logo = requests.get(company_logo_url)
+    company_logo = Image.open(BytesIO(response_logo.content))
+except Exception as e:
+    st.error(f"Error loading company logo: {e}")
+    company_logo = None
 
-response_background = requests.get(background_image_url)
-background_image = Image.open(BytesIO(response_background.content))
+try:
+    response_background = requests.get(background_image_url)
+    background_image = Image.open(BytesIO(response_background.content))
+except Exception as e:
+    st.error(f"Error loading background image: {e}")
+    background_image = None
 
 # Convert background image to base64
-try:
-    buffered = BytesIO()
-    background_image.save(buffered, format="JPEG")
-    background_image_base64 = base64.b64encode(buffered.getvalue()).decode()
-except Exception as e:
-    st.error(f"Error encoding background image to base64: {e}")
+if background_image:
+    try:
+        buffered = BytesIO()
+        background_image.save(buffered, format="JPEG")
+        background_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+    except Exception as e:
+        st.error(f"Error encoding background image to base64: {e}")
+        background_image_base64 = ""
+else:
     background_image_base64 = ""
 
 # Display background image using Streamlit's image with background styling
@@ -132,7 +143,8 @@ if "welcome_page" not in st.session_state:
 
 if st.session_state.welcome_page:
     # Display the company logo and welcome box
-    st.image(company_logo, use_column_width=True)
+    if company_logo:
+        st.image(company_logo, use_column_width=True)
 
     st.markdown(f"<div class='welcome-text'>Welcome to the Quiz!</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='welcome-subtext'>Presented by Narmada Bio Chem Limited</div>", unsafe_allow_html=True)
