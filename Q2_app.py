@@ -1,16 +1,23 @@
 import streamlit as st
 import random
 from PIL import Image
-import base64
-import io
+import requests
+from io import BytesIO
 
-# Load images from local files
-company_logo = Image.open("narmada_logo.png")  # Path to your local logo image
-background_image = Image.open("green_background.jpg")  # Path to your local background image
+# URL to the raw images in your GitHub repository
+company_logo_url = "https://raw.githubusercontent.com/your-username/your-repo/main/path/to/narmada_logo.png"
+background_image_url = "https://raw.githubusercontent.com/your-username/your-repo/main/path/to/green_background.jpg"
+
+# Load images from GitHub
+response_logo = requests.get(company_logo_url)
+company_logo = Image.open(BytesIO(response_logo.content))
+
+response_background = requests.get(background_image_url)
+background_image = Image.open(BytesIO(response_background.content))
 
 # Convert background image to base64
-buffered = io.BytesIO()
-background_image.save(buffered, format="JPEG")  # Adjust format based on your image type
+buffered = BytesIO()
+background_image.save(buffered, format="JPEG")
 background_image_base64 = base64.b64encode(buffered.getvalue()).decode()
 
 # Display background image using Streamlit's image with background styling
@@ -65,7 +72,7 @@ st.markdown(
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         text-align: center;
         font-size: 1.2em;
-        color: #2d4739; /* Ensures text is visible */
+        color: #2d4739;
     }}
     .option-button {{
         display: block;
@@ -86,8 +93,6 @@ st.markdown(
         margin: 20px 0;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         text-align: center;
-        animation: slideIn 0.5s ease-out;
-        /* Removed black and white box effect */
     }}
     .score-text {{
         color: #2d4739;
