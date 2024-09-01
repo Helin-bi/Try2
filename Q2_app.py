@@ -3,12 +3,11 @@ import random
 from PIL import Image
 import requests
 from io import BytesIO
+import base64  # Import base64 for encoding
 
 # URL to the raw images in your GitHub repository
 company_logo_url = "https://github.com/Helin-bi/Try2/blob/main/narmada%20logo.png?raw=true"
 background_image_url = "https://github.com/Helin-bi/Try2/blob/main/green_background.jpg?raw=true"
-
-
 
 # Load images from GitHub
 response_logo = requests.get(company_logo_url)
@@ -18,9 +17,13 @@ response_background = requests.get(background_image_url)
 background_image = Image.open(BytesIO(response_background.content))
 
 # Convert background image to base64
-buffered = BytesIO()
-background_image.save(buffered, format="JPEG")
-background_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+try:
+    buffered = BytesIO()
+    background_image.save(buffered, format="JPEG")
+    background_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+except Exception as e:
+    st.error(f"Error encoding background image to base64: {e}")
+    background_image_base64 = ""
 
 # Display background image using Streamlit's image with background styling
 st.markdown(
